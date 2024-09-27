@@ -4,7 +4,6 @@
 #include "blockHeader.h"
 #include "transaction.h"
 #include "mempool.h"
-
 #include "mining.h"
 #include "blockchain.h"
 
@@ -28,7 +27,7 @@ int main(){
     // Initialize the mining class (send mempool and blockchain to Mining)
     Mining mine(&m,&blockchain); 
 
-    // Run the mining in a SEPARATE THREAD, to listen for new txns concurrently
+    // Run the mining in a SEPARATE THREAD, to listen for new txnt concurrently
     std::thread miningThread(&Mining::mine, &mine);
     
     // Mining thread runs independently
@@ -48,7 +47,7 @@ int main(){
         Transaction txn(from, to, amount); // Creating a transaction
         m.addTxn(txn); // Adding the transaction to the mempool
         cout << "Transaction added to mempool" << endl;
-        cout << "Enter 0 to quit/1 to continue: ";
+        cout << "Enter 0 to quit/1 to continue: "<<endl;
         cin >> enter;
         cout << endl;
     }
