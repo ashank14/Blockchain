@@ -4,6 +4,10 @@
 #include "blockHeader.h"
 #include "block.h"
 #include "blockchain.h"
+#include <chrono>
+#include <thread>
+
+using namespace std;
 
 void Mining::mine(){
     //Infinite loop for checking new transactions in mempool
@@ -29,10 +33,11 @@ void Mining::mine(){
 
         cout<<"Mining started"<<endl;
         //set 2 minute timer to simulate mining (Pause), replace later with actual mining logic
-        
+	this_thread::sleep_for(chrono::minutes(1));	        
 
         //Add the block to the blockchain
         blockchain->blockchain.push_back(newBlock);
+	cout<<"Block added to the Blockchain"<<endl;
 
     }
 }
