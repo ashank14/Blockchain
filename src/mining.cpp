@@ -19,9 +19,9 @@ void Mining::mine(){
         //Include 2 transactions in a block
         vector<Transaction>memTxns;
         int i=0;
-	bool f=false;
+	    bool f=false;
         while(i<2&&!m->txns.empty()){
-	    f=true;
+	        f=true;
             //Get txn from mempool
             Transaction tx=m->txns.front();
             //add to memTxns
@@ -29,19 +29,26 @@ void Mining::mine(){
             i++;
             m->txns.pop();
         }
-	
-	if(f){ 
-           //Add transactions to candidate block
-           newBlock.transactions=memTxns;
+        //If transactions available in mempool
+        if(f){ 
+            //Add transactions to candidate block
+            newBlock.transactions=memTxns;
 
-       	   cout<<"Mining started"<<endl;
-       	   //set 2 minute timer to simulate mining (Pause), replace later with actual mining logic
-	   this_thread::sleep_for(chrono::seconds(15));	        
+            cout<<"Mining started"<<endl;
+            //set 2 minute timer to simulate mining (Pause), replace later with actual mining logic
+            this_thread::sleep_for(chrono::seconds(15));	        
 
-	    //Add the block to the blockchain
-	    blockchain->blockchain.push_back(newBlock);
-	    cout<<"Block added to the Blockchain"<<endl;
+            //Add the block to the blockchain
+            blockchain->blockchain.push_back(newBlock);
+            cout<<"Block added to the Blockchain"<<endl;
 
-	}
-     }
+        }
+
+        //If no new inputs and mempool empty, stop mining
+        if(m->txns.empty()&&!mineFlag){
+            cout<<"Mempool empty...Stop mining"<<endl;
+            break;
+        }
+
+    }
 }

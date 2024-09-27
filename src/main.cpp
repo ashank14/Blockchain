@@ -16,7 +16,7 @@ int main(){
     string from;
     string to;
     int amount;
-    int enter=1;
+    bool enter=1;
 
     // Initialize the blockchain
     Blockchain blockchain;
@@ -27,12 +27,9 @@ int main(){
     // Initialize the mining class (send mempool and blockchain to Mining)
     Mining mine(&m,&blockchain); 
 
-    // Run the mining in a SEPARATE THREAD, to listen for new txnt concurrently
+    // Run the mining in a SEPARATE THREAD, to listen for new txns concurrently
     std::thread miningThread(&Mining::mine, &mine);
     
-    // Mining thread runs independently
-    miningThread.detach();
-
     // Input transactions
     while(enter){
         cout << "Enter sender's wallet address: ";
@@ -51,4 +48,9 @@ int main(){
         cin >> enter;
         cout << endl;
     }
+    //Stop input
+    //Signal to stop mining if mempool empty
+    mine.mineFlag=false;
+    //Wait for mining to complete for remaining transactions in the mempool
+    miningThread.join();
 }
