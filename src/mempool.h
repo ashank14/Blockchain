@@ -2,10 +2,10 @@
 #define MEMPOOL_H
 #include <string>
 #include "transaction.h"
-#include <vector>
-class mempool{
+#include <queue>
+class Mempool{
     public:
-        vector<Transaction>txns;
+        queue<Transaction>txns; //Queue for now, will change to a something similar to a priority queue
         void addTxn(Transaction txn);
 };
 

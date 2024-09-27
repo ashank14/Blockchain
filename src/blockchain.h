@@ -2,11 +2,14 @@
 #define BLOCKCHAIN_H
 
 #include <iostream>
+#include "block.h"
+#include <vector>
 using namespace std;
 
 class Blockchain {
     public:
-        void createblock();
+        vector<Block>blockchain;
+        void displayBlockchain();
 };
 
 #endif

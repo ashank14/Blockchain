@@ -12,10 +12,8 @@ class Block{
         blockHeader header;
         vector<Transaction>transactions;
         void displayblock();
-
-        Block(blockHeader header,vector<Transaction>transactions){
+        Block(blockHeader header){
             this->header=header;
-            this->transactions=transactions;
         }
 };
 
