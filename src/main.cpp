@@ -4,7 +4,7 @@
 #include "blockHeader.h"
 #include "transaction.h"
 #include "mempool.h"
-#include "mempool.cpp"
+
 #include "mining.h"
 #include "blockchain.h"
 
