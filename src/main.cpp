@@ -6,13 +6,24 @@
 #include "mempool.h"
 #include "mining.h"
 #include "blockchain.h"
-
+#include "generateKeypair.h"
 #include <string>
 #include <iostream>
 
 using namespace std;
 
 int main(){
+
+    bool i;
+    cout<<"Enter 1 to generate a public-private key pair(Wallet address)/0 to start a transaction: ";
+    cin>>i;
+    cout<<endl;
+    if(i){
+        cout<<"Key Pair :"<<endl;
+        generateRSAKeyPair(2048);
+        
+        return 0;
+    }
     string from;
     string to;
     int amount;
