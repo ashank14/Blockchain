@@ -6,14 +6,17 @@
 #include "blockchain.h"
 #include <chrono>
 #include <thread>
+#include <string>
 
 using namespace std;
 
 void Mining::mine(){
     //Infinite loop for checking new transactions in mempool
     while(true){
+        //get the hash for the previous block
+        string prevhash=blockchain->blockchain.back().header.hashPrev;
         //Create a header for the candidate block
-        blockHeader BH("version","hashPrev","hashMerkleRoot",10,10,2);
+        blockHeader BH("version",prevhash,"hashMerkleRoot",10,10,2);
         //Initialize the Candidate block with the header
         Block newBlock(BH);
         //Include 2 transactions in a block
@@ -35,12 +38,43 @@ void Mining::mine(){
             newBlock.transactions=memTxns;
 
             cout<<"Mining started"<<endl;
-            //set 2 minute timer to simulate mining (Pause), replace later with actual mining logic
-            this_thread::sleep_for(chrono::seconds(15));	        
+            //set 15 second timer to simulate mining (Pause), replace later with actual mining logic
+            this_thread::sleep_for(chrono::seconds(15));	
+
+            //Remove the UTXOs which were sent as inputs and create new UTXOs sent as outputs
+
+            for(const Transaction&t:memTxns){
+                //Remove each Input of every transaction
+                for(const Input&i:t.inputs){
+                    utxoset->removeUTXO(i.prevOut);
+                }
+                
+                //Create new UTXOs which were sent as outputs
+
+                //serialize the transaction for the transaction id
+                string txid;
+                int index=1;
+                for(const Output&o:t.outputs){
+                    Coin c;
+                    c.txout=o;
+                    Outpoint op;
+                    op.index=index;
+                    op.txid=txid;
+                    utxoset->addUTXO(op,c);
+                    index++;
+
+                }
+            }
+
+            
+
 
             //Add the block to the blockchain
             blockchain->blockchain.push_back(newBlock);
             cout<<"Block added to the Blockchain"<<endl;
+            blockchain->displayBlockchain();
+            cout<<endl;
+
 
         }
 

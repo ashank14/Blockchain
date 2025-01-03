@@ -3,58 +3,84 @@
 #include "block.h"
 #include "blockHeader.h"
 #include "transaction.h"
+#include "transaction.h"
 #include "mempool.h"
 #include "mining.h"
-#include "blockchain.h"
 #include "generateKeypair.h"
+#include "utxoSet.h"
+#include "util.h"
 #include <string>
+
 #include <iostream>
 
+using namespace util;
 using namespace std;
 
 int main(){
 
-    bool i;
-    cout<<"Enter 1 to generate a public-private key pair(Wallet address)/0 to start a transaction: ";
-    cin>>i;
-    cout<<endl;
-    if(i){
-        cout<<"Key Pair :"<<endl;
-        generateRSAKeyPair(2048);
-        
-        return 0;
-    }
-    string from;
-    string to;
-    int amount;
-    bool enter=1;
-
     // Initialize the blockchain
     Blockchain blockchain;
+    //Create the genesis block
+    blockHeader BH("version","#0","hashMerkleRoot",10,10,2);
+    Block newBlock(BH);
+    blockchain.blockchain.push_back(newBlock);
+
+    cout<<"Genesis block created"<<endl;
+    blockchain.displayBlockchain();
+    //Initialize a UTXO set
+    Utxoset u;
+    //Put initial utxos in the set
 
     // Initializing a memory pool
     Mempool m; 
 
     // Initialize the mining class (send mempool and blockchain to Mining)
-    Mining mine(&m,&blockchain); 
+    Mining mine(&m,&blockchain,&u); 
 
-    // Run the mining in a SEPARATE THREAD, to listen for new txns concurrently
+    // Run the mining in a SEPARATE THREAD, so the main thread listens for new txns 
     std::thread miningThread(&Mining::mine, &mine);
+
+    
+    string from;
+    string scriptSig;
+    string to;
+    string sig;
+    double amount;
+    bool enter=1;
     
     // Input transactions
     while(enter){
         cout << "Enter sender's wallet address: ";
         cin >> from;
         cout << endl;
+        //Get scriptPubKey from sender's wallet address
+        string scriptPubKey=addressToSPK(from);
+
+        //Get UTXOs associated with the sender's wallet address
+        cout<<"Your UTXOs are: "<<endl;
+        vector<Outpoint>avlUtxos=u.getUtxos(scriptPubKey);
+
         cout << "Enter recipient's wallet address: ";
         cin >> to;
         cout << endl;
         cout << "Enter amount to be sent: ";
         cin >> amount;
         cout << endl;
-        Transaction txn(from, to, amount); // Creating a transaction
-        m.addTxn(txn); // Adding the transaction to the mempool
-        cout << "Transaction added to mempool" << endl;
+        cout<<"Enter your scriptSig: ";
+        cin>>scriptSig;
+        cout<<endl;
+
+        //Creating a transaction
+        Transaction tx; 
+        tx.createTxn(u,avlUtxos,from,to,amount,scriptSig); 
+
+        //Validate the transaction i.e check if the transaction uses any inputs that are still in an unconfirmed transaction or are not in the utxo set
+        if(m.validateTxn(tx,u)){
+            m.addTxn(tx); // Adding the transaction to the mempool
+            cout << "Transaction added to mempool" << endl;
+        }else{
+            cout<<"Failed to validate the transaction"<<endl;
+        };
         cout << "Enter 0 to quit/1 to continue: "<<endl;
         cin >> enter;
         cout << endl;

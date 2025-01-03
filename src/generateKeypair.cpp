@@ -14,7 +14,7 @@ void generateRSAKeyPair(int bits) {
     // Create a context for key generation
     EVP_PKEY_CTX *ctx = EVP_PKEY_CTX_new(pkey, nullptr);
     if (!ctx) {
- std::cerr << "OpenSSL Error: " << ERR_error_string(errno, nullptr) << std::endl;
+        std::cerr << "OpenSSL Error: " << ERR_error_string(errno, nullptr) << std::endl;
         std::cerr << "Error creating context." << std::endl;
         EVP_PKEY_free(pkey);
         return;

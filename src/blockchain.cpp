@@ -1,7 +1,8 @@
 #include "blockchain.h"
-
+#include <vector>
 void Blockchain::displayBlockchain() {
-    for (int i = 0; i < 4; i++) {
-        cout << i << endl;
+    cout<<"Current Blockchain:";
+    for (auto i:blockchain) {
+        cout<<i.header.hashPrev<<" ";
     }
 }
