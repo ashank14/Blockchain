@@ -8,7 +8,7 @@ using namespace util;
 
 vector<Outpoint> Utxoset::getUtxos(string scriptPubKey){
     
-    //Check digital signature across scriptpubkey of all UTXOs to get the UTXOs associated to it
+    //Check input scriptpubkey across scriptpubkey of all UTXOs to get the UTXOs associated to it
     vector<Outpoint>utxos;
     for(auto i=utxoset.begin();i!=utxoset.end();i++){
         if(scriptPubKey==i->second.txout.scriptPubKey){

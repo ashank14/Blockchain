@@ -2,7 +2,7 @@
 
 void Block::displayblock(){
     cout<<header.version<<endl;
-    for(auto i:this->transactions){
-        cout<<i.from<<" "<<i.to<<" "<<i.amount<<endl;
+    for(auto i:this->txHash){
+        cout<<i<<endl;
     }
 }

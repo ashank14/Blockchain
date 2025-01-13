@@ -4,11 +4,13 @@
 #include "blockHeader.h"
 #include "block.h"
 #include "blockchain.h"
+#include "util.h"
 #include <chrono>
 #include <thread>
 #include <string>
 
 using namespace std;
+using namespace util;
 
 void Mining::mine(){
     //Infinite loop for checking new transactions in mempool
@@ -33,7 +35,7 @@ void Mining::mine(){
             m->txns.pop();
         }
         //If transactions available in mempool
-        if(f){ 
+        if(f){
             //Add transactions to candidate block
             newBlock.transactions=memTxns;
 
@@ -43,16 +45,18 @@ void Mining::mine(){
 
             //Remove the UTXOs which were sent as inputs and create new UTXOs sent as outputs
 
-            for(const Transaction&t:memTxns){
+            for(Transaction&t:memTxns){
                 //Remove each Input of every transaction
                 for(const Input&i:t.inputs){
                     utxoset->removeUTXO(i.prevOut);
                 }
                 
-                //Create new UTXOs which were sent as outputs
-
+                
                 //serialize the transaction for the transaction id
-                string txid;
+                string txid=sha256(sha256Binary(t.serializeTxn()));
+                newBlock.txHash.push_back(txid);
+                
+                //Create new UTXOs which were sent as outputs
                 int index=1;
                 for(const Output&o:t.outputs){
                     Coin c;
@@ -65,9 +69,6 @@ void Mining::mine(){
 
                 }
             }
-
-            
-
 
             //Add the block to the blockchain
             blockchain->blockchain.push_back(newBlock);

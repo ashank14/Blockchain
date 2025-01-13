@@ -11,6 +11,7 @@ class Block{
     public:
         blockHeader header;
         vector<Transaction>transactions;
+        vector<string>txHash;
         void displayblock();
         Block(blockHeader header){
             this->header=header;

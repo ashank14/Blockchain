@@ -8,9 +8,8 @@
 #include "mining.h"
 #include "generateKeypair.h"
 #include "utxoSet.h"
-#include "util.h"
 #include <string>
-
+#include "util.h"
 #include <iostream>
 
 using namespace util;
@@ -45,6 +44,8 @@ int main(){
     string scriptSig;
     string to;
     string sig;
+    string privateKey;
+    string publicKey;
     double amount;
     bool enter=1;
     
@@ -53,6 +54,12 @@ int main(){
         cout << "Enter sender's wallet address: ";
         cin >> from;
         cout << endl;
+        cout << "Enter sender's public Key: ";
+        cin >> publicKey;
+        cout << endl;
+        cout<<"Enter private key: ";
+        cin>>privateKey;
+        cout<<endl;
         //Get scriptPubKey from sender's wallet address
         string scriptPubKey=addressToSPK(from);
 
@@ -70,9 +77,21 @@ int main(){
         cin>>scriptSig;
         cout<<endl;
 
-        //Creating a transaction
+        //Creating an unsigned transaction
         Transaction tx; 
-        tx.createTxn(u,avlUtxos,from,to,amount,scriptSig); 
+        tx.createTxn(u,avlUtxos,from,to,amount); 
+        
+        //serialize and hash the transaction
+        string serializedTxn=tx.serializeTxn();
+        
+        //sign the transaction
+        string digitalSignature=sign(serializedTxn,privateKey);
+
+        //add the scriptsig to the inputs of the  transaction
+        for(Input input:tx.inputs){
+            input.scriptSig=digitalSignature+" "+publicKey;
+        }
+        
 
         //Validate the transaction i.e check if the transaction uses any inputs that are still in an unconfirmed transaction or are not in the utxo set
         if(m.validateTxn(tx,u)){
